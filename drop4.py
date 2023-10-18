@@ -81,14 +81,17 @@ def get_location_values():
     # read output from Drop3 and sort them in ascending order based on name
     with open(file_path_records) as csvfile:
         csv_reader = csv.reader(csvfile, delimiter=',')
-        # sorted_reader = sorted(list(csv_reader), key=lambda row: row[3])
+        sorted_reader = sorted(list(csv_reader), key=lambda row: row[4])
 
-        for field in csv_reader:
+        # add each formatted record to the list
+        for field in sorted_reader:
             id, name, location = field[2:]
             latitude,longitude = process_csv_record(location)
             
-            # TBD - add record to list - i dont know where to put this
-            record_list.append(f"{str(id)},\"{str(name)}\",\"{str(location)}\",{str(latitude)},{str(longitude)}\n")
+            record = f"{str(id)},\"{str(name)}\",\"{str(location)}\",{str(latitude)},{str(longitude)}\n"
+            record_list.append(record)
+
+            print(record)
 
     #end of function
     return record_list
@@ -189,5 +192,5 @@ if __name__ == "__main__":
     write_files_to_output_file(file_path_header, file_path_location, file_path_output)
 
     # write the final output to the output dataset
-    write_output_file_to_dataset(file_path_header, dataset_path_output)
+    write_output_file_to_dataset(file_path_output, dataset_path_output)
 
