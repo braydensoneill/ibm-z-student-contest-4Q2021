@@ -52,8 +52,8 @@ def write_to_files():
     
     # write header lines
     file_header = open(file_path_header, 'w')
-    file_header.write(f"host:{str(host)} platform: {str(platform)} os: {str(os)}\n")
-    file_header.write(f"{str(north)},{str(west)} {str(south)},{str(east)}\n")
+    file_header.write(f"host:{str(host)} platform:{str(platform)} os:{str(os)}\n")
+    file_header.write(f"{str(north)},{str(east)} {str(south)},{str(west)}\n")
     file_header.close()
     print(f"Data written to {file_path_header}")
 
@@ -81,17 +81,17 @@ def get_location_values():
     # read output from Drop3 and sort them in ascending order based on name
     with open(file_path_records) as csvfile:
         csv_reader = csv.reader(csvfile, delimiter=',')
-        sorted_reader = sorted(list(csv_reader), key=lambda row: row[4])
+        sorted_reader = sorted(list(csv_reader), key=lambda row: row[3])
 
         # add each formatted record to the list
         for field in sorted_reader:
             id, name, location = field[2:]
             latitude,longitude = process_csv_record(location)
             
-            record = f"{str(id)},\"{str(name)}\",\"{str(location)}\",{str(latitude)},{str(longitude)}\n"
+            record = f"{str(id)},\"{str(name)}\",\"{str(location)}\", {str(latitude)}, {str(longitude)}\n"
             record_list.append(record)
 
-            print(record)
+            print(record[:-1])
 
     #end of function
     return record_list
@@ -141,22 +141,21 @@ def write_output_file_to_dataset(_file_in, _dataset_out):
     # print message for clarity during execution
     print(f"Writing data from {_file_in} to {_dataset_out}..")
 
+    # list to store all lines from the input file
+    lines = []
+
     # open the input file
     with open(_file_in, 'r') as file:
+        # read all lines from file into list
+        lines = file.readlines()
 
-        # loop through all the sorted lines with an index
-        for index, line in enumerate(file):
-            # for the first line, do not append so that you start with a fresh file, [:-1] to ignore the \n
-            if index == 0:
-                datasets.write(_dataset_out, line[:-1], False)
-            # append for the rest
-            else:
-                datasets.write(_dataset_out, line[:-1], True)
+    # write list to the dataset
+    datasets.write(_dataset_out, "".join(lines), False)
 
     # print successful execution message
     print(f'Data written to {_dataset_out}')
 
-    # end of function
+    # End of function
     return
 
 if __name__ == "__main__":
